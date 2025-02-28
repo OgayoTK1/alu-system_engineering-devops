@@ -1,6 +1,24 @@
-Host myserver
+#!/usr/bin/env bash
+#SSH configuration file creation
+
+Host web01
     HostName 184.73.106.244
-    ubuntu
+    User ubuntu
     IdentityFile ~/.ssh/school
     PasswordAuthentication no
+    PubkeyAuthentication yes
+    IdentitiesOnly yes
+
+# Now, use the custom SSH configuration file for connection
+ssh -F ~/.ssh/config ubuntu@184.73.106.244
+
+# Append the public key to the authorized_keys file
+echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDDxF/L5eSluDBMhfnEFXT/haL+CvQebViqB3tEaMB2vqZh1bwrlC9VZY6DVYhOr3Bo4zGqKRQ6Ae+Z2NJkdDBOc8ZvmQNdkLGjiv7VKSrZjhG2jC+MTyoVtAvMBEYIKYnS6z1paGnZ1QA0U5z8avYJ3l6wwGfmFwBwfWqDcS/NEumCLiq1f2ia/irUy8wxRfygjI0x79/bpP5vd9qcxVG6Fo3dceMG2kfQ7nbP+iaG2WGrJjILEaEP5C8BhcnYrK0N1AmSzT3hJyE2YbaZwdCrChtpdK+e9oj3COXLMVX9pzZ0ZnVHBpkdy3/HObC+XozMrYRRB+TLGMhOQWhXtRyosgrqOlXfvX9UtqRHK56pviR3UcyeW6AOng16nFGLwQ+K/11XPFDT/w4LSQWC+3XufK94amdUnnJaOY8NNWw9molRMsZbqzw1YtHyCz58XR+ux46kV9Czh0sJZG4xQcCcTdzF+tZRdAR3UsdyrvuxyKXAjmttZMeuzWQ497pLeb4QqYblYoi4pFVp1J/3a49ZeaHtvISh4V+ClgTRjuu++htbk9zlJfAOxu+JFjw/T9KXIO7lUWM0S4lP1fK6JOzcfaZH0KohLS5TocnWx0mdrVOq/qLBQVAyf1rsTo51YgwiAYCioHIPo9q8CSqXMaV+nfV3YZ634NBX7TEnaG4Jvw==">> ~/.ssh/authorized_keys
+ 
+# Ensure correct permissions
+chmod 600 ~/.ssh/authorized_keys
+chmod 700 ~/.ssh
+
+# Now, use the custom SSH configuration file for connection
+ssh -F ~/.ssh/config ubuntu@184.73.106.244
 
