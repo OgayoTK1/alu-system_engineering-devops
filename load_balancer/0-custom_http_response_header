@@ -1,33 +1,57 @@
 #!/usr/bin/env bash
-#Updates the current state of the server
-#Installs Nginx on the server
-#Changes the user and user group ownership for editing file
-#overwrites the default page of nginx
-#overwrites the default configuration file default
-#add a redirection and a location for the redirection
-#restarts nginx
+# Updates the current state of the server
+# Installs Nginx on the server
+# Changes the user and user group ownership for editing files
+# Overwrites the default page of nginx
+# Overwrites the default configuration file default
+# Adds a redirection and a location for the redirection
+# Restarts nginx
+
+# Update package list and install Nginx
 apt-get -y update
 apt-get install -y nginx
+
+# Change ownership to the current user for editing files
 sudo chown -R "$USER":"$USER" /var/www/html
 sudo chown -R "$USER":"$USER" /etc/nginx/sites-available/default
+
+# Create a custom index.html page
 echo "Holberton School for the win!" > /var/www/html/index.html
+
+# Create a custom 404 error page
 echo "Ceci n'est pas une page" > /var/www/html/404.html
+
+# Modify the default Nginx site configuration file
 echo "server {
-	listen 80 default_server;
-	listen [::]:80 default_server;
-	root /var/www/html;
-	index index.html index.htm 404.html index.nginx-debian.html;
-	server_name _;
-	add_header X-Served-By $HOSTNAME;
-	location /redirect_me {
-		return 301 https://www.youtube.com/watch?v=-VGIt10m9VQ;
-	}
-	location /xyz {
-		return 404;
-	}
-	error_page 404 /404.html;
-}" > /etc/nginx/sites-available/default
-sudo chown -R root:root /var/www/html
-sudo chown -R root:root /etc/nginx/sites-available/default
+        listen 80 default_server;
+        listen [::]:80 default_server;
+        root /var/www/html;
+        index index.html index.htm 404.html index.nginx-debian.html;
+        server_name _;
+
+        # Custom header to show the server that served the page
+        add_header X-Served-By \$HOSTNAME;
+
+        # Redirect from /redirect_me to a YouTube link with a 301 status
+        location /redirect_me {
+                return 301 https://www.youtube.com/watch?v=-VGIt10m9VQ;
+        }
+
+        # Return 404 for /xyz
+        location /xyz {
+                return 404;
+        }
+
+        # Custom 404 error page
+        error_page 404 /404.html;
+}" | sudo tee /etc/nginx/sites-available/default > /dev/null
+
+# Test Nginx configuration
+sudo nginx -t
+
+# Restart Nginx to apply the changes
 sudo service nginx restart
-sudo service nginx reload
+
+# Confirm the service is running
+sudo service nginx status
+
