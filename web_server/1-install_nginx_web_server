@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# JDI
+sudo apt-get update -y;
+sudo apt-get install -y nginx;
+sudo apt-get install -y ufw;
+
+sudo ufw enable;
+sudo ufw allow 'Nginx HTTP';
+sudo ufw allow 'OpenSSH';
+
+sudo cp ./1-nginx.conf /etc/nginx/sites-enabled/default;
+
+sudo nginx -s reload;
