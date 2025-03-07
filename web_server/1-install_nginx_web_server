@@ -1,36 +1,8 @@
 #!/usr/bin/env bash
-# Script to install and configure Nginx on an Ubuntu server
+# installs nginx and configure it to listen on port 80
+# print "Hello World"
 
-# Update package list and install Nginx
-sudo apt-get update -y
-sudo apt-get install nginx -y
-
-# Ensure Nginx listens on port 80
-sudo sed -i 's|# listen 80 default_server;|listen 80 default_server;|' /etc/nginx/sites-available/default
-sudo sed -i 's|# listen \[::\]:80 default_server;|listen \[::\]:80 default_server;|' /etc/nginx/sites-available/default
-
-# Replace the default HTML file with the required text
-echo 'Holberton School for the win!' | sudo tee /var/www/html/index.html > /dev/null
-
-# Restart Nginx (without systemctl)
-sudo service nginx restart
-
-# Wait a few seconds for Nginx to start
-sleep 2
-
-# Verify Nginx is running and responding correctly
-if curl -sI 127.0.0.1 | grep -q "200 OK"; then
-    echo "Nginx is running and responding with HTTP 200."
-else
-    echo "Error: Nginx is not responding correctly. Check logs at /var/log/nginx."
-    exit 1
-fi
-
-# Test content is served correctly
-if curl -s 127.0.0.1 | grep -q "Holberton School"; then
-    echo "Nginx is correctly serving 'Holberton School for the win!'"
-else
-    echo "Error: Nginx is not serving the expected content."
-    exit 1
-fi
-
+sudo apt-get update
+sudo apt-get -y install nginx
+echo 'Holberton School' | sudo tee /var/www/html/index.html
+sudo service nginx start
