@@ -1,6 +1,11 @@
-#!/usr/bin/env bash
-#configures nginx on new ubuntu machine
-apt-get update
-apt-get install nginx -y
+!/usr/bin/env bash
+# Install nginx on web-01 server, listening on port 80 (default),
+# and return a page that contains the expected output string
+
+sudo apt-get -y update
+sudo apt-get -y install nginx
+ufw allow 80
+
+# reassign ownership to user acct so that they can be writeable
+sudo chown -R "$USER":"$USER"  /var/www/html
 echo "Holberton School for the win!" > /var/www/html/index.html
-sudo service nginx restart
