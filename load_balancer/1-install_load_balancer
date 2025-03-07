@@ -1,20 +1,57 @@
 #!/usr/bin/env bash
-# Install and configure HAproxy on your lb-01 server.
-# Make sure that HAproxy can be managed via an init script
+# Create a script to install and configure HAProxy on lb-01 server
+# Configure HAProxy to send traffic to web-01 and web-02 servers
+
+
+# Install and configure HAproxy on my lb-01 server.
 sudo apt-get -y update
 sudo apt-get -y install haproxy
 
-echo \
+# edit config file
+server_config=\
 "
-frontend lb-frontend
+frontend  ogayo_frontend
         bind *:80
         mode http
-        default_backend lb-backend
-backend lb-backend
+        default_backend seyi_backend
+backend ogayo_backend
         balance roundrobin
         server 6478-web-01 184.73.106.244 check
-        server web-02 3.87.190.9 check
-" | sudo tee -a /etc/haproxy/haproxy.cfg
+        server 6478-web-02 3.87.190.9 check
+"
+echo "$server_config" | sudo tee -a /etc/haproxy/haproxy.cfg
 
-echo "ENABLED=1" | sudo tee -a /etc/default/haproxy
+# enable haproxy to be started by init script
+echo "ENABLED=1" | sudo tee -a /etc/default/haproxy/
+
+# Testing the HAproxy configuration file
+sudo haproxy -c -f /etc/haproxy/haproxy.cfg
 sudo service haproxy restart
+=======
+#Updates the current state of the server
+#Installs Nginx on the server
+#Changes the user and user group ownership for editing file
+#overwrites the default page of nginx
+#overwrites the default configuration file default
+#add a redirection and a location for the redirection
+#restarts nginx
+apt-get -y update
+apt-get install -y nginx
+sudo chown -R "$USER":"$USER" /etc/nginx/sites-available/default
+echo "upstream servers{
+	server 54.90.65.110;
+	server 3.87.190.9;}
+	server {
+	listen 80 default_server;
+	listen [::]:80 default_server;
+	location / {
+		proxy_pass http://servers;
+		proxy_set_header Host $host;
+		proxy_set_header X-Real-IP $remote_addr;
+		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+		proxy_set_header X-Forwarded-Proto $scheme;}
+}" > /etc/nginx/sites-available/default
+sudo chown -R root:root /etc/nginx/sites-available/default
+sudo service nginx restart
+sudo service nginx reload
+>>>>>>> e66edae5465274878f753523bf74807e3d2684d5
