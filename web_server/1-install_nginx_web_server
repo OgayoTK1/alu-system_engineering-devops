@@ -1,8 +1,29 @@
 #!/usr/bin/env bash
-# installs nginx and configure it to listen on port 80
-# print "Hello World"
+# Installing nginx
 
-sudo apt-get update
-sudo apt-get -y install nginx
-echo 'Holberton School' | sudo tee /var/www/html/index.html
-sudo service nginx start
+# Update package lists
+apt-get update -y
+
+# Install Nginx
+apt-get install -y nginx
+
+# Ensure Nginx is running
+nginx
+
+# Create a custom HTML page with the required content
+echo "Holberton School for the win!" | tee /var/www/html/index.html > /dev/null
+
+# Allow traffic on port 80 (if UFW is enabled)
+ufw allow 80/tcp || true
+
+# Restart Nginx using an alternative method (without systemctl)
+killall nginx
+nginx
+
+# Confirm Nginx is serving the expected content
+if curl -s localhost | grep -q "Holberton School"; then
+    echo "Nginx is successfully configured!"
+else
+    echo "Error: Nginx is not serving the expected content!"
+    exit 1
+fi
