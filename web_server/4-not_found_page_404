@@ -1,24 +1,6 @@
-#!/usr/bin/env bash
-#nginx configuration for 404 not found page
-
-# Ensure Nginx is running (if not already)
-sudo nginx || true
-
-# Define the custom 404 error page content
-ERROR_PAGE_PATH="/var/www/html/custom_404.html"
-echo "Ceci n'est pas une page" | sudo tee "$ERROR_PAGE_PATH" > /dev/null
-
-# Update Nginx config to use the custom 404 error page
-NGINX_CONF="/etc/nginx/sites-available/default"
-
-# Add a custom error page directive to the server block
-sudo sed -i '/server_name _;/a \n    error_page 404 /custom_404.html;\n    location = /custom_404.html {\n        root /var/www/html;\n        internal;\n    }' "$NGINX_CONF"
-
-# Restart Nginx without systemctl
-sudo killall nginx 2>/dev/null || sudo pkill nginx
-sudo nginx
-
-# Confirm the custom 404 page works by testing the HTTP status and content
-curl -sI http://100.27.27.252/xyz | grep "404 Not Found" && echo "Custom 404 error page works!"
-curl -s http://100.27.27.252/xyzfoo | grep "Ceci n'est pas une page" && echo "Custom 404 page displays correctly!"
-
+#!/bin/bash
+sudo apt update
+sudo apt install -y nginx
+echo "Ceci n'est pas une page" | sudo tee /var/www/html/404.html > /dev/null
+sudo sed -i "/server_name _;/a \ \ \ \ error_page 404 /404.html;\n\ \ \ \ location = /404.html {\n\ \ \ \ \ \ \ \ internal;\n\ \ \ \ }" /etc/nginx/sites-available/default
+sudo service nginx restart
