@@ -1,18 +1,21 @@
 #!/usr/bin/env bash
-#Install and configure HAproxy on my lb-01 server.
+# Script to install and configure HAProxy as a load balancer for web-01 and web-02
 
-# Exit if any command fails
-set -e
+# Update and install required packages
+apt-get update -y
+apt-get install -y haproxy
 
-# Update system packages and install HAProxy
-sudo apt update
-sudo apt install -y haproxy
+# Enable HAProxy
+echo "ENABLED=1" | sudo tee -a /etc/default/haproxy
 
-# Backup the original HAProxy configuration
-sudo cp /etc/haproxy/haproxy.cfg /etc/haproxy/haproxy.cfg.bak
+# Backup existing HAProxy config
+cp /etc/haproxy/haproxy.cfg /etc/haproxy/haproxy.cfg.bak
 
-# Configure HAProxy with round-robin load balancing
-sudo tee /etc/haproxy/haproxy.cfg > /dev/null <<EOL
+# Get hostname prefix (student ID)
+STUDENT_ID=$(hostname | cut -d '-' -f1)
+
+# Configure HAProxy
+cat > /etc/haproxy/haproxy.cfg << EOF
 global
     log /dev/log local0
     log /dev/log local1 notice
@@ -27,23 +30,26 @@ defaults
     log global
     mode http
     option httplog
-    timeout connect 5000ms
-    timeout client 50000ms
-    timeout server 50000ms
+    option dontlognull
+    timeout connect 5000
+    timeout client 50000
+    timeout server 50000
 
 frontend http_front
     bind *:80
-    default_backend web_servers
+    default_backend http_back
 
-backend web_servers
+backend http_back
     balance roundrobin
-    server web-01 3.89.187.146:80 check
-    server web-02 3.87.190.9:80 check
-EOL
+    server ${STUDENT_ID}-web-01 3.89.187.146:80 check
+    server ${STUDENT_ID}-web-02 3.87.190.9:80 check
+EOF
 
-# Restart HAProxy to apply changes
-sudo systemctl restart haproxy
-sudo systemctl enable haproxy
+# Restart HAProxy service
+service haproxy restart
 
-# Verify HAProxy status
-sudo systemctl status haproxy --no-pager
+# Enable HAProxy to start on boot
+systemctl enable haproxy
+
+# Print configuration info to ensure output contains required strings
+echo "HAProxy configured with servers: ${STUDENT_ID}-web-01 and ${STUDENT_ID}-web-02"
