@@ -1,49 +1,8 @@
 #!/usr/bin/env bash
-#Install and configure HAproxy on my lb-01 server.
+# installs nginx and configure it to listen on port 80
+# print "Hello World"
 
-# Exit if any command fails
-set -e
-
-# Update system packages and install HAProxy
-sudo apt update
-sudo apt install -y haproxy
-
-# Backup the original HAProxy configuration
-sudo cp /etc/haproxy/haproxy.cfg /etc/haproxy/haproxy.cfg.bak
-
-# Configure HAProxy with round-robin load balancing
-sudo tee /etc/haproxy/haproxy.cfg > /dev/null <<EOL
-global
-    log /dev/log local0
-    log /dev/log local1 notice
-    chroot /var/lib/haproxy
-    stats socket /run/haproxy/admin.sock mode 660 level admin
-    stats timeout 30s
-    user haproxy
-    group haproxy
-    daemon
-
-defaults
-    log global
-    mode http
-    option httplog
-    timeout connect 5000ms
-    timeout client 50000ms
-    timeout server 50000ms
-
-frontend http_front
-    bind *:80
-    default_backend web_servers
-
-backend web_servers
-    balance roundrobin
-    server web-01 100.27.27.252:80 check
-    server web-02 18.208.133.92:80 check
-EOL
-
-# Restart HAProxy to apply changes
-sudo systemctl restart haproxy
-sudo systemctl enable haproxy
-
-# Verify HAProxy status
-sudo systemctl status haproxy --no-pager
+sudo apt-get update
+sudo apt-get -y install nginx
+echo 'Holberton School' | sudo tee /var/www/html/index.html
+sudo service nginx start
