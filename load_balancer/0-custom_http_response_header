@@ -8,4 +8,4 @@ sudo sed -i "47i\\\tadd_header X-Served-By $HOSTNAME;" /etc/nginx/sites-availabl
 echo "Holberton School" |sudo tee /var/www/html/index.html
 echo "Ceci n'est pas une page" | sudo tee /usr/share/nginx/html/404.html
 
-sudo service nginx starti
+sudo service nginx start
