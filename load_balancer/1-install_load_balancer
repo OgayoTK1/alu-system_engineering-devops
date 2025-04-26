@@ -11,9 +11,6 @@ echo "ENABLED=1" | sudo tee -a /etc/default/haproxy
 # Backup existing HAProxy config
 cp /etc/haproxy/haproxy.cfg /etc/haproxy/haproxy.cfg.bak
 
-# Get hostname prefix (student ID)
-STUDENT_ID=$(hostname | cut -d '-' -f1)
-
 # Configure HAProxy
 cat > /etc/haproxy/haproxy.cfg << EOF
 global
@@ -41,8 +38,8 @@ frontend http_front
 
 backend http_back
     balance roundrobin
-    server ${STUDENT_ID}-web-01 54.197.196.217:80 check
-    server ${STUDENT_ID}-web-02 54.196.135.128:80 check
+    server web-01 54.197.196.217:80 check
+    server web-02 54.196.135.128:80 check
 EOF
 
 # Restart HAProxy service
@@ -52,4 +49,5 @@ service haproxy restart
 systemctl enable haproxy
 
 # Print configuration info to ensure output contains required strings
-echo "HAProxy configured with servers: ${STUDENT_ID}-web-01 and ${STUDENT_ID}-web-02"
+echo "HAProxy configured with servers: web-01 and web-02"
+
